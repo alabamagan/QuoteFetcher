@@ -16,5 +16,5 @@ YAHOO_FINANCE_DICT = {
         'Volume': 'Volume'
     },
     'TimeKey': 'LastTradeDateTimeUTC',
-    'TimeString': '%Y-%m-%d %H:%M:%S %Z%z'
+    'TimeString': '%Y-%m-%d %H:%M:%S UTC+0000'
 }

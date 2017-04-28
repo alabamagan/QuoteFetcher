@@ -15,22 +15,52 @@ logging.basicConfig(
 
 def YahooGetQuote(yahoodict):
     outdict = {}
-    for symbol in yahoodict['symbols']:
+    for symbol in yahoodict['Symbols']:
         stock = yahoo_finance.Share(symbol)
-        fieldMapper = yahoodict['FieldMapper']
+        fieldMapper = yahoodict['FieldsMapper']
 
-        # Check if the trading time difference is arround 15 minutes
+        # DEBUG
         quoteTime = stock.data_set[yahoodict['TimeKey']]
         quoteTime = datetime.datetime.strptime(quoteTime, yahoodict['TimeString'])
+        quoteTime = quoteTime.replace(tzinfo=pytz.timezone('utc'))
         quoteTime = quoteTime.astimezone(pytz.timezone("Asia/Hong_Kong"))
         localtime = datetime.datetime.now(pytz.timezone("Asia/Hong_Kong"))
-        dt = quoteTime - localtime
         for key in fieldMapper:
             val = stock.data_set[key]
             outkey = fieldMapper[key]
-
+            print val, outkey
             if (outkey == 'LastTradingPrice' or outkey == 'Volume'):
                 outdict[outkey] = float(val)
+            if (outkey == 'LastTradingTime'):
+                outdict[outkey] = quoteTime
+
+        # loopbreak = 0
+        # # Check if the trading time difference is arround 15 minutes
+        # while(True):
+        #     quoteTime = stock.data_set[yahoodict['TimeKey']]
+        #     quoteTime = datetime.datetime.strptime(quoteTime, yahoodict['TimeString'])
+        #     quoteTime = quoteTime.astimezone(pytz.timezone("Asia/Hong_Kong"))
+        #     localtime = datetime.datetime.now(pytz.timezone("Asia/Hong_Kong"))
+        #     dt = quoteTime - localtime
+        #     # while dt is not enough
+        #     if (dt.total_seconds() > 5):
+        #         loopbreak += 1
+        #         if (loopbreak > 500):
+        #             return False
+        #         continue
+        #     else:
+        #         for key in fieldMapper:
+        #             val = stock.data_set[key]
+        #             outkey = fieldMapper[key]
+        #             print val, outkey
+        #             if (outkey == 'LastTradingPrice' or outkey == 'Volume'):
+        #                 outdict[outkey] = float(val)
+        #             if (outkey == 'LastTradingTime'):
+        #                 outdict[outkey] = quoteTime
+        #         return outdict
+
+
+
 
 
 
@@ -66,6 +96,9 @@ def FindClosestTradingTime():
         return nextworkingday # Not within trading period
 
 
+def debug():
+    YahooGetQuote(QuoteFetcherDict.YAHOO_FINANCE_DICT)
+
 def main():
     while(True):
         try:
@@ -98,4 +131,5 @@ if __name__ == '__main__':
             logging.error("Generating Output folder failed!")
 
     logging.info("Start quote fetcher...")
-    main()
+    # main()
+    debug()
